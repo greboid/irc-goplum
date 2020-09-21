@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/greboid/irc/v2/plugins"
 	"net/http"
 	"time"
 
 	"github.com/greboid/irc/v2/logger"
+	"github.com/greboid/irc/v2/plugins"
 	"github.com/greboid/irc/v2/rpc"
 	"github.com/kouhin/envflag"
 	"go.uber.org/zap"
