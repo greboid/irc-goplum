@@ -40,6 +40,7 @@ func main() {
 	err = helper.RegisterWebhook("goplum", handleGoPlum)
 	if err != nil {
 		log.Fatalf("Unable to register webhook: %s", err.Error())
+		return
 	}
 	log.Infof("exiting")
 }
