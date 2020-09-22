@@ -27,12 +27,13 @@ var (
 
 func main() {
 	log = logger.CreateLogger(*Debug)
-	if err := envflag.Parse(); err != nil {
+	err := envflag.Parse()
+	if err != nil {
 		log.Fatalf("Unable to load config: %s", err.Error())
 		return
 	}
 	log.Infof("Creating goplum RPC Client")
-	helper, err := plugins.NewHelper(*RPCHost, uint16(*RPCPort), *RPCToken)
+	helper, err = plugins.NewHelper(*RPCHost, uint16(*RPCPort), *RPCToken)
 	if err != nil {
 		log.Fatalf("Unable to create plugin helper: %s", err.Error())
 		return
@@ -58,6 +59,11 @@ func handleGoPlum(request *rpc.HttpRequest) *rpc.HttpResponse {
 		err := json.Unmarshal(request.Body, &data)
 		if err != nil {
 			log.Errorf("Unable to handle webhook: %s", err.Error())
+			return
+		}
+		if len(data.Text) == 0 {
+			log.Debugf("Invalid webhook received")
+			return
 		}
 		helper.SendIRCMessage(*Channel, []string{fmt.Sprintf("Monitoring: %s", data.Text)})
 	}()
