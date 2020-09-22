@@ -45,7 +45,6 @@ func main() {
 }
 
 func handleGoPlum(request *rpc.HttpRequest) *rpc.HttpResponse {
-	log.Infof("Received webhook: %s vs %s", request.Path, fmt.Sprintf("goplum/%s", *Secret))
 	if request.Path != fmt.Sprintf("/goplum/%s", *Secret) {
 		return &rpc.HttpResponse{
 			Status: http.StatusNotFound,
@@ -53,6 +52,7 @@ func handleGoPlum(request *rpc.HttpRequest) *rpc.HttpResponse {
 		}
 	}
 	go func() {
+		log.Infof("Received goplum notification")
 		data := GoPlumHook{}
 		err := json.Unmarshal(request.Body, &data)
 		if err != nil {
