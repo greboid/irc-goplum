@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/greboid/irc/v2/logger"
-	"github.com/greboid/irc/v2/plugins"
-	"github.com/greboid/irc/v2/rpc"
+	"github.com/greboid/irc/v3/logger"
+	"github.com/greboid/irc/v3/plugins"
+	"github.com/greboid/irc/v3/rpc"
 	"github.com/kouhin/envflag"
 	"go.uber.org/zap"
 )
@@ -22,7 +22,7 @@ var (
 	Secret   = flag.String("secret", "", "Secret for masking url")
 	Debug    = flag.Bool("debug", false, "Show debugging info")
 	log      *zap.SugaredLogger
-	helper   plugins.PluginHelper
+	helper   *plugins.PluginHelper
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		return
 	}
 	log.Infof("Creating goplum RPC Client")
-	helper, err = plugins.NewHelper(*RPCHost, uint16(*RPCPort), *RPCToken)
+	helper, err = plugins.NewHelper(fmt.Sprintf("%s:%d", *RPCHost, uint16(*RPCPort)), *RPCToken)
 	if err != nil {
 		log.Fatalf("Unable to create plugin helper: %s", err.Error())
 		return
@@ -65,7 +65,10 @@ func handleGoPlum(request *rpc.HttpRequest) *rpc.HttpResponse {
 			log.Debugf("Invalid webhook received")
 			return
 		}
-		helper.SendIRCMessage(*Channel, []string{fmt.Sprintf("Monitoring: %s", data.Text)})
+		err = helper.SendChannelMessage(*Channel, fmt.Sprintf("Monitoring: %s", data.Text))
+		if err != nil {
+			log.Debugf("Error sending channel message: %s", err.Error())
+		}
 	}()
 	return &rpc.HttpResponse{
 		Body:   []byte("Delivered"),
