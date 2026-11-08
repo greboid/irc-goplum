@@ -12,6 +12,9 @@ Receives notifications from a [goplum](https://github.com/csmith/goplum) instanc
 At a bare minimum you also need to give it a channel, a secret to use as part of the URL to receive notifications
  on and an RPC token.  You'll like also want to specify the bot host.
 
+You can optionally set a message prefix (`-message-prefix` / `MESSAGE_PREFIX`), which is added to the start of
+ each message sent to the channel.
+
 Once configured the URL to configure in goplum would be <Bot URL>/goplum/<secret>
 
 #### Example running
@@ -27,6 +30,7 @@ service:
       RPC_TOKEN: <as configured on the bot>
       CHANNEL: #spam
       SECRET: cUCrb7HJ
+      MESSAGE_PREFIX: "[Goplum]"
 ```
 
 ```

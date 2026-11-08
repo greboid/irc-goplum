@@ -15,14 +15,15 @@ import (
 )
 
 var (
-	RPCHost  = flag.String("rpc-host", "localhost", "gRPC server to connect to")
-	RPCPort  = flag.Int("rpc-port", 8001, "gRPC server port")
-	RPCToken = flag.String("rpc-token", "", "gRPC authentication token")
-	Channel  = flag.String("channel", "", "Channel to send messages to")
-	Secret   = flag.String("secret", "", "Secret for masking url")
-	Debug    = flag.Bool("debug", false, "Show debugging info")
-	log      *zap.SugaredLogger
-	helper   *plugins.PluginHelper
+	RPCHost       = flag.String("rpc-host", "localhost", "gRPC server to connect to")
+	RPCPort       = flag.Int("rpc-port", 8001, "gRPC server port")
+	RPCToken      = flag.String("rpc-token", "", "gRPC authentication token")
+	Channel       = flag.String("channel", "", "Channel to send messages to")
+	Secret        = flag.String("secret", "", "Secret for masking url")
+	MessagePrefix = flag.String("message-prefix", "", "Prefix to add to the start of each message")
+	Debug         = flag.Bool("debug", false, "Show debugging info")
+	log           *zap.SugaredLogger
+	helper        *plugins.PluginHelper
 )
 
 func main() {
@@ -65,7 +66,11 @@ func handleGoPlum(request *rpc.HttpRequest) *rpc.HttpResponse {
 			log.Debugf("Invalid webhook received")
 			return
 		}
-		err = helper.SendChannelMessage(*Channel, fmt.Sprintf("Monitoring: %s", data.Text))
+		message := fmt.Sprintf("Monitoring: %s", data.Text)
+		if *MessagePrefix != "" {
+			message = fmt.Sprintf("%s %s", *MessagePrefix, message)
+		}
+		err = helper.SendChannelMessage(*Channel, message)
 		if err != nil {
 			log.Debugf("Error sending channel message: %s", err.Error())
 		}
